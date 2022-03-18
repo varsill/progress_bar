@@ -1,10 +1,10 @@
 defmodule ProgressBar do
-  def render(current, total) do
-    ProgressBar.Determinate.render(current, total)
+  def render(current, total, additional_information) do
+    ProgressBar.Determinate.render(current, total, additional_information)
   end
 
-  def render(current, total, custom_format) do
-    ProgressBar.Determinate.render(current, total, custom_format)
+  def render(current, total, additional_information, custom_format) do
+    ProgressBar.Determinate.render(current, total, additional_information, custom_format)
   end
 
   def render_indeterminate(fun) do

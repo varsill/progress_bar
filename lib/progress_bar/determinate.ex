@@ -13,13 +13,14 @@ defmodule ProgressBar.Determinate do
     width: :auto,
   ]
 
-  def render(current, total, custom_format \\ @default_format) when current <= total do
+  def render(current, total, additional_information, custom_format \\ @default_format) when current <= total do
     format = Keyword.merge(@default_format, custom_format)
 
     percent = (current / total * 100) |> round
 
     suffix = [
       formatted_percent(format[:percent], percent),
+      additional_information,
       formatted_suffix(format[:suffix], current, total),
       newline_if_complete(current, total),
     ]

@@ -13,34 +13,34 @@ defmodule DeterminateTest do
 
   test "renders a bar" do
     assert_bar(
-      ProgressBar.render(0, 3, @format) ==
+      ProgressBar.render(0, 3, "", @format) ==
         "|                                                                                                    |   0%"
     )
 
     assert_bar(
-      ProgressBar.render(1, 3, @format) ==
+      ProgressBar.render(1, 3, "", @format) ==
         "|=================================                                                                   |  33%"
     )
 
     assert_bar(
-      ProgressBar.render(2, 3, @format) ==
+      ProgressBar.render(2, 3, "", @format) ==
         "|===================================================================                                 |  67%"
     )
 
     assert_bar(
-      ProgressBar.render(3, 3, @format) ==
+      ProgressBar.render(3, 3, "", @format) ==
         "|====================================================================================================| 100%"
     )
   end
 
   test "does not render progress above 100%" do
     assert_raise FunctionClauseError, fn ->
-      ProgressBar.render(4, 3, @format)
+      ProgressBar.render(4, 3, "", @format)
     end
   end
 
   test "includes ANSI sequences to clear and re-write the line" do
-    bar = capture_io(fn -> ProgressBar.render(1, 1) end)
+    bar = capture_io(fn -> ProgressBar.render(1, 1, "") end)
     assert String.starts_with?(bar, "\e[2K\r")
   end
 
@@ -50,7 +50,7 @@ defmodule DeterminateTest do
       width: 20
     ]
 
-    actual = capture_io(fn -> ProgressBar.render(2, 3, format) end)
+    actual = capture_io(fn -> ProgressBar.render(2, 3, "", format) end)
     actual_visible = Utils.strip_invisibles(actual)
 
     expected_visible = "|=========    |  67%"
@@ -60,8 +60,8 @@ defmodule DeterminateTest do
   end
 
   test "adds a newline when complete" do
-    incomplete_bar = capture_io(fn -> ProgressBar.render(1, 2) end)
-    completed_bar = capture_io(fn -> ProgressBar.render(2, 2) end)
+    incomplete_bar = capture_io(fn -> ProgressBar.render(1, 2, "") end)
+    completed_bar = capture_io(fn -> ProgressBar.render(2, 2, "") end)
 
     refute String.ends_with?(incomplete_bar, "\n")
     assert String.ends_with?(completed_bar, "\n")
@@ -78,7 +78,7 @@ defmodule DeterminateTest do
     ]
 
     assert_bar(
-      ProgressBar.render(2, 3, format) ==
+      ProgressBar.render(2, 3, "", format) ==
         "(XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.................................)"
     )
   end
@@ -88,7 +88,7 @@ defmodule DeterminateTest do
       left: [IO.ANSI.magenta(), "(", IO.ANSI.reset()]
     ]
 
-    bar = capture_io(fn -> ProgressBar.render(1, 2, format) end)
+    bar = capture_io(fn -> ProgressBar.render(1, 2, "", format) end)
     assert bar =~ IO.chardata_to_string([IO.ANSI.magenta(), "(", IO.ANSI.reset(), "==="])
   end
 
@@ -96,7 +96,7 @@ defmodule DeterminateTest do
     format = [bar: "X", right: "]", width: @width]
 
     assert_bar(
-      ProgressBar.render(2, 3, format) ==
+      ProgressBar.render(2, 3, "", format) ==
         "|XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                 ]  67%"
     )
   end
@@ -107,7 +107,7 @@ defmodule DeterminateTest do
       blank_color: IO.ANSI.red_background()
     ]
 
-    bar = capture_io(fn -> ProgressBar.render(1, 2, format) end)
+    bar = capture_io(fn -> ProgressBar.render(1, 2, "", format) end)
 
     assert bar =~ IO.chardata_to_string(["|", IO.ANSI.white(), IO.ANSI.green_background(), "="])
     assert bar =~ IO.chardata_to_string(["=", IO.ANSI.reset(), IO.ANSI.red_background(), " "])
@@ -118,16 +118,16 @@ defmodule DeterminateTest do
     mb = 1_000_000
     format = [suffix: :bytes, width: @width]
 
-    assert_bar ProgressBar.render(0, mb, format)      == "|                                                                                                    |   0% (0.00/1.00 MB)"
-    assert_bar ProgressBar.render(mb / 2, mb, format) == "|==================================================                                                  |  50% (0.50/1.00 MB)"
-    assert_bar ProgressBar.render(mb, mb, format)     == "|====================================================================================================| 100% (1.00 MB)"
+    assert_bar ProgressBar.render(0, mb, "", format)      == "|                                                                                                    |   0% (0.00/1.00 MB)"
+    assert_bar ProgressBar.render(mb / 2, mb, "", format) == "|==================================================                                                  |  50% (0.50/1.00 MB)"
+    assert_bar ProgressBar.render(mb, mb, "", format)     == "|====================================================================================================| 100% (1.00 MB)"
   end
 
   test "suffix: :count" do
     mb = 100
     format = [suffix: :count, width: @width]
-    assert_bar ProgressBar.render(0, mb, format)  == "|                                                                                                    |   0% (0/100)"
-    assert_bar ProgressBar.render(50, mb, format) == "|==================================================                                                  |  50% (50/100)"
-    assert_bar ProgressBar.render(mb, mb, format) == "|====================================================================================================| 100% (100)"
+    assert_bar ProgressBar.render(0, mb, "", format)  == "|                                                                                                    |   0% (0/100)"
+    assert_bar ProgressBar.render(50, mb, "", format) == "|==================================================                                                  |  50% (50/100)"
+    assert_bar ProgressBar.render(mb, mb, "", format) == "|====================================================================================================| 100% (100)"
   end
 end
